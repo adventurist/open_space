@@ -12,8 +12,10 @@ int main(int argc, char** argv) {
   create();
 
   for (const auto& node : world->nodes) {
-    std::cout << node << std::endl;
+    std::cout << node << "\n\n" << std::endl;
   }
+
+  world->toGeoJSON();
 
   return 0;
 }
@@ -21,8 +23,13 @@ int main(int argc, char** argv) {
 void create() {
   world->nodes.clear();
   world->nodes.push_back(Node{});
-  for (const auto& i : range<int>{1, 100000}) {
-    world->nodes.push_back(Node{&world->nodes.at(i - 1), &world->master_node, getRandom()});
+  for (const auto& i : range<int>{1, 100}) {
+    world->nodes.push_back(Node{
+      &world->nodes.at(i - 1),
+      &world->master_node,
+      getRandom(),
+      GeoUtil::getLocation()
+    });
   }
 }
 
