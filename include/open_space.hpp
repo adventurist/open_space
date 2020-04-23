@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <geolocation.hpp>
+#include <util.hpp>
 
 #define ZONE_A 'A'
 #define ZONE_B 'B'
@@ -24,6 +25,8 @@ class Node {
 
   void setZone(int z);
 
+  GeoLocation<float> location();
+
   friend std::ostream &operator<<(std::ostream& out, const Node& node) {
     out << "Location:    " << node.geolocation.longitude << " longitude   " << node.geolocation.latitude << " latitude\n" << "Zone: " << node.zone << "\nBud: " << node.bud << "\nNext: " << node.next << std::endl;
     return out;
@@ -39,6 +42,7 @@ class Node {
 
 class World {
  public:
+  void toGeoJSON();
   Node master_node;
   std::vector<Node> nodes;
 };

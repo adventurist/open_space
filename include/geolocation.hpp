@@ -5,6 +5,7 @@
 #include <utility>
 #include <limits>
 #include <random>
+#include <string>
 
 // Replace default tuple access interface
 #define First(x) std::get<0>(x)
@@ -110,6 +111,12 @@ inline GeoLocation<float> getLocation() {
     180.0f / getRandom<float>(),
     90.0f / getRandom<float>()
   };
+}
+
+inline std::string geoJSONFeature(GeoLocation<float> location, const char* id) {
+  std::string geoJSONString{"{\"type\": \"Feature\",\n  \"geometry\": {\n    \"type\": \"Point\",\n    \"coordinates\": " + std::to_string(location.longitude) + ", " + std::to_string(location.latitude) + "\n  },\n  \"properties\": {\n    \"name\":\"" + id + "\"\n}"};
+
+  return geoJSONString;
 }
 }
 #endif // __GEO_LOCATION_HPP__

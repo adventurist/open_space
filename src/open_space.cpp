@@ -17,3 +17,14 @@ void Node::setZone(int z) {
   }
 }
 
+GeoLocation<float> Node::location() {
+  return geolocation;
+}
+
+void World::toGeoJSON() {
+  std::string geoJSONString{};
+  for (auto& node : nodes) {
+    geoJSONString += GeoUtil::geoJSONFeature(node.location(), reinterpret_cast<const char*>(&node));
+  }
+  saveFile(geoJSONString, "nodes.json");
+}

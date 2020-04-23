@@ -15,13 +15,15 @@ int main(int argc, char** argv) {
     std::cout << node << "\n\n" << std::endl;
   }
 
+  world->toGeoJSON();
+
   return 0;
 }
 
 void create() {
   world->nodes.clear();
   world->nodes.push_back(Node{});
-  for (const auto& i : range<int>{1, 100000}) {
+  for (const auto& i : range<int>{1, 100}) {
     world->nodes.push_back(Node{
       &world->nodes.at(i - 1),
       &world->master_node,
