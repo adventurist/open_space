@@ -28,7 +28,8 @@ void create() {
       &world->nodes.at(i - 1),
       &world->master_node,
       getRandom(),
-      GeoUtil::getLocation()
+      GeoUtil::getLocation(),
+      i
     });
   }
 }

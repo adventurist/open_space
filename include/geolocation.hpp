@@ -113,16 +113,16 @@ inline GeoLocation<float> getLocation() {
   };
 }
 
-inline std::string geoJSONFeature(GeoLocation<float> location, const char* id) {
+inline std::string geoJSONFeature(GeoLocation<float> location, std::string id) {
   std::string geoJSONString{
-    "{\"type\": \"Feature\",\n\
-      \"geometry\": {\n\
-        \"type\": \"Point\",\n\
-        \"coordinates\": " + std::to_string(location.longitude) + ", " + std::to_string(location.latitude) + "\n\
-       },\n\
-      \"properties\": {\n\
-        \"name\":\"" + id + "\"\n\
-        }"};
+    "{\"type\": \"Feature\",\
+      \"geometry\": {\
+        \"type\": \"Point\",\
+        \"coordinates\": [" + std::to_string(location.longitude) + ", " + std::to_string(location.latitude) + "]\
+       },\
+      \"properties\": {\
+        \"name\":\"" + id + "\"\
+        }}"};
 
   return geoJSONString;
 }

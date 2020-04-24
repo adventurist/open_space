@@ -7,7 +7,7 @@ Node::Node(Node* bud, Node* next, int x) : bud(bud), next(next), geolocation(std
   setZone(x);
 }
 
-Node::Node(Node* bud, Node* next, int x, GeoLocation<float> location) : bud(bud), next(next), geolocation(location) {
+Node::Node(Node* bud, Node* next, int x, GeoLocation<float> location, int id) : bud(bud), next(next), geolocation(location), id(id) {
   setZone(x);
 }
 
@@ -22,9 +22,13 @@ GeoLocation<float> Node::location() {
 }
 
 void World::toGeoJSON() {
-  std::string geoJSONString{};
+  std::string geoJSONString{"{\
+    \"type\": \"FeatureCollection\",\
+  \"features\": ["};
   for (auto& node : nodes) {
-    geoJSONString += GeoUtil::geoJSONFeature(node.location(), reinterpret_cast<const char*>(&node));
+    geoJSONString += GeoUtil::geoJSONFeature(node.location(), std::to_string(node.id)) + ",\n";
   }
+  geoJSONString.erase(geoJSONString.size() - 2);
+  geoJSONString += "]}";
   saveFile(geoJSONString, "nodes.json");
 }

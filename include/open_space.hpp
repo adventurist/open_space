@@ -22,6 +22,7 @@ class Node {
   Node(Node* bud, Node* next);
   Node(Node* bud, Node* next, int x);
   Node(Node* bud, Node* next, int x, GeoLocation<float> location);
+  Node(Node* bud, Node* next, int x, GeoLocation<float> location, int id);
 
   void setZone(int z);
 
@@ -32,6 +33,7 @@ class Node {
     return out;
   }
 
+  int id;
 
  private:
   Node* bud;
