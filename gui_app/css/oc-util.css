@@ -1,0 +1,286 @@
+.nav-ui-wrap  {
+  position: absolute;
+  margin-left: 1%;
+  margin-top: 1%;
+}
+
+.nav-ui-wrap div{
+  border: 4px solid #5555ff;
+}
+
+#nav-arrows {
+  border: none;
+  height:8em;
+  display: block;
+  position: relative;
+  margin-top: 25%;
+}
+
+#zoom {
+  border: none;
+  width:2em;
+  height:4em;
+  display: block;
+  left: 35%;
+  position: relative;
+}
+
+#zoom-in {
+  width:2em;
+  height:2em;
+  background-image: url(../gfx/in.svg);
+  background-color: #ffffff;
+}
+
+#zoom-out {
+  width:2em;
+  height:2em;
+  margin-top: 10%;
+  background-image: url(../gfx/out.svg);
+  background-color: #ffffff;
+}
+
+#nav-up {
+  position: relative;
+  margin-bottom: 2.5%;
+  width:2em;
+  height:2em;
+  left: 35%;
+  background-image: url(../gfx/up.svg);
+  background-color: #ffffff;
+}
+
+#nav-left {
+  width:2em;
+  height:2em;
+  display: inline-block;
+  background-image: url(../gfx/left.svg);
+  background-color: #ffffff;
+}
+#nav-right {
+  width:2em;
+  height:2em;
+  display: inline-block;
+  background-image: url(../gfx/right.svg);
+  background-color: #ffffff;
+}
+#nav-down {
+  /*position: relative;
+  left: 14.25%;*/
+  width:2em;
+  height:2em;
+  display: inline-block;
+  /*margin-top: -1%;*/
+  background-image: url(../gfx/down.svg);
+  background-color: #ffffff;
+}
+
+#nav-up > a, #nav-down > a, #nav-left > a, #nav-right > a {
+  min-width: 100%;
+  min-height: 100%;
+}
+
+#nav-up:hover, #nav-down:hover, #nav-left:hover, #nav-right:hover, #zoom-in:hover, #zoom-out:hover,
+#nav-up:focus, #nav-down:focus, #nav-left:focus, #nav-right:focus, #zoom-in:focus, #zoom-out:focus {
+  /*opacity: 0.3;*/
+  background-color: #5555ff;
+}
+
+#nav-reset {
+  width: 3em;
+  height: 2.5em;
+  display: inline-block;
+  position: relative;
+  margin-left: 27%;
+  background-color: #ffffff;
+  background-image: url(../gfx/reset.svg);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 67%;
+}
+
+#nav-reset:hover, #nav-reset:focus {
+  /*opacity: 0.3;*/
+  background-color: #5555ff;
+}
+
+#layer-toggle {
+  width: 2em;
+  height: 2em;
+  margin-left: 32%;
+  position: relative;
+  display: inline-block;
+  background-color: #ffffff;
+  background-image: url(../gfx/globe.svg);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-si1ze: 90%;
+}
+
+#layer-toggle:hover {
+  background-color: #5555ff;
+}
+
+#legend {
+  transform: translateY(52em);
+  margin-left: 2%;
+}
+
+#legend-pre {
+  display: inline-block;
+  float: left;
+  font-size: 120%;
+  margin-top: 2.5%;
+}
+
+#legend-group {
+  display: inline;
+}
+
+#legend-group div > div.colour-block {
+  font-size: 1.5em;
+  font-weight: 700;
+  width: 16em;
+  height: 2em;
+  margin-top: 2%;
+  border: 1px solid black;
+  text-align: center;
+  line-height: 2em;
+  vertical-align: middle;
+}
+
+#legend-group div.legend-row-left {
+  float: left;
+  max-width: 50%;
+  display: inline;
+  margin-left: 5%;
+}
+
+#legend-group div.legend-row-right {
+  float: right;
+  max-width: 50%;
+  display: inline;
+  margin-right: 5%;
+
+}
+
+#legend-group div.legend-text {
+  display: inline;
+  width: 10em;
+  line-height: 2em;
+  font-size: 1.4em;
+  vertical-align: middle;
+}
+
+.colour-block {
+  border: 4px solid #5555ff!important;
+}
+.colour-block:focus, .colour-block:hover {
+  background-color: #5555ff!important;
+}
+
+/* ----------- Galaxy S4 ----------- */
+
+/* Portrait and Landscape */
+@media screen and (max-width: 768px) {
+
+  #zoom-in, #zoom-out, #nav-up, #nav-down, #nav-left, #nav-right {
+    width: 1em;
+    height: 1em;
+    background-repeat: no-repeat;
+    background-position: center center;
+    display: inline-block;
+  }
+
+  #zoom-out {
+    margin-top: none;
+  }
+
+    #nav-reset {
+    width: 1.2em;
+    height: 1.2em;
+    margin-left: 0;
+  }
+
+  .nav-ui-wrap {
+    transform: translateY(155%);
+  }
+
+  #nav-arrows {
+    margin-top: 0;
+    width: 50%;
+    height: auto;
+  }
+
+  #zoom {
+    display: inline;
+    left: 0;
+  }
+
+  #nav-up {
+    left: 0;
+    margin-bottom: 0;
+  }
+
+  #legend {
+    float: right;
+    height: 0;
+    width: 100%;
+    text-align: center;
+    transform: translateY(26.5em);
+  }
+
+  #legend-group div > div.colour-block  {
+    width: 10%;
+    font-size: 60%;
+    margin-left: 5%;
+    float: none;
+    display: inline-block;
+  }
+
+  #legend-group div.legend-text {
+    display: none;
+  }
+
+  #legend-group div.legend-row-left {
+    margin-left: 0;
+    float: none;
+    }
+
+  #legend-group div.legend-row-right  {
+    float: none;
+  }
+
+  #legend-pre {
+    display: none;
+  }
+}
+
+
+@media screen and (min-width: 768px)
+and (max-width: 1370px) {
+
+  #cesiumContainer {
+    width: 100%;
+  }
+  #legend {
+    font-size: 65%;
+    transform: translateY(53.5em);
+  }
+
+  #legend-pre {
+    display: none;
+  }
+}
+
+@media screen and (min-width: 1370px)
+and (max-width: 1600px) {
+  #legend {
+      transform: translateY(44em);
+  }
+
+  #legend-group div.legend-text {
+    font-size: 1em;
+  }
+
+}
