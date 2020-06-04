@@ -27,6 +27,7 @@ class Node {
   void setZone(int z);
 
   GeoLocation<float> location();
+  void moveBy(GeoLocation<float> delta);
 
   friend std::ostream &operator<<(std::ostream& out, const Node& node) {
     out << "Location:    " << node.geolocation.longitude << " longitude   " << node.geolocation.latitude << " latitude\n" << "Zone: " << node.zone << "\nBud: " << node.bud << "\nNext: " << node.next << std::endl;
@@ -47,6 +48,10 @@ class World {
   void toGeoJSON();
   Node master_node;
   std::vector<Node> nodes;
+  void tick();
+ private:
+  uint8_t getTime();
+  uint8_t time = 0;
 };
 }  // namespace Space
 #endif  // __OPEN_SPACE_HPP__

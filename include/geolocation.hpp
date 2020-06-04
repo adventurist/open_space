@@ -88,6 +88,11 @@ class GeoLocation {
 	// implement - http://www.movable-type.co.uk/scripts/latlong-vincenty.html
     return T{};
   }
+
+  void moveBy(GeoLocation<T> delta) {
+    longitude = longitude + delta.longitude;
+    latitude = latitude + delta.latitude;
+  }
 };
 
 namespace GeoUtil {

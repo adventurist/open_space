@@ -23,7 +23,7 @@ int main(int argc, char** argv) {
   return 0;
 }
 
-void create() {
+World create(World* world) {
   world->nodes.clear();
   world->nodes.push_back(Node{});
   for (const auto& i : range<int>{1, 100}) {
@@ -35,17 +35,15 @@ void create() {
       i
     });
   }
+  return std::move(*world);
 }
 
 void run() {
   world = new World{};
-  create();
-
-  for (const auto& node : world->nodes) {
-    std::cout << node << "\n\n" << std::endl;
+  World active_world = create(world);
+  for (;;) {
+    active_world.tick();
+    active_world.toGeoJSON();
   }
-
-  world->toGeoJSON();
   delete world;
 }
-

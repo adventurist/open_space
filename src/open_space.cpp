@@ -17,6 +17,10 @@ void Node::setZone(int z) {
   }
 }
 
+void Node::moveBy(GeoLocation<float> delta) {
+  geolocation.moveBy(delta);
+}
+
 GeoLocation<float> Node::location() {
   return geolocation;
 }
@@ -31,4 +35,18 @@ void World::toGeoJSON() {
   geoJSONString.erase(geoJSONString.size() - 2);
   geoJSONString += "]}";
   saveFile(geoJSONString, "nodes.json");
+}
+
+uint8_t World::getTime() {
+  return time++;
+}
+
+void World::tick() {
+  for (auto&& node : nodes) {
+    std::cout << "Previous\n" << node << std::endl;
+    GeoLocation<float> delta{GeoUtil::getRandom<float>(1.0f, 5.0f), GeoUtil::getRandom<float>(1.0f, 5.0f)};
+    node.moveBy(delta);
+    std::cout << "Now\n" << node << std::endl;
+  }
+  std::cout << "World time: " << +getTime() << std::endl;
 }
