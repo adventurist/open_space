@@ -17,8 +17,8 @@ void Node::setZone(int z) {
   }
 }
 
-void Node::moveBy(GeoLocation<float> delta) {
-  geolocation.moveBy(delta);
+void Node::moveBy(const GeoLocation<float>& delta) {
+  geolocation + delta;
 }
 
 GeoLocation<float> Node::location() {

@@ -27,10 +27,11 @@ class Node {
   void setZone(int z);
 
   GeoLocation<float> location();
-  void moveBy(GeoLocation<float> delta);
+
+  void moveBy(const GeoLocation<float>& delta);
 
   friend std::ostream &operator<<(std::ostream& out, const Node& node) {
-    out << "Location:    " << node.geolocation.longitude << " longitude   " << node.geolocation.latitude << " latitude\n" << "Zone: " << node.zone << "\nBud: " << node.bud << "\nNext: " << node.next << std::endl;
+    out << "Location:    " << node.geolocation.longitude() << " longitude   " << node.geolocation.latitude() << " latitude\n" << "Zone: " << node.zone << "\nBud: " << node.bud << "\nNext: " << node.next << std::endl;
     return out;
   }
 

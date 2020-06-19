@@ -7,93 +7,124 @@
 #include <random>
 #include <string>
 
-// Replace default tuple access interface
-#define First(x) std::get<0>(x)
-#define Second(x) std::get<1>(x)
+namespace Constants {
+  static constexpr int LAT_LIMIT = 90;
+  static constexpr int LNG_LIMIT = 180;
+} // namespace Constants
 
-/**
- * GeoCoordinate of type Longitude or Latitude
- */
+enum DegreeType { LATITUDE = 0, LONGITUDE = 1 };
+using D = DegreeType;
+
 template <typename T>
 class GeoCoordinate {
-  typedef T DegreeValue;
-  typedef std::pair<T, T> CoordPair;
+  T value;
+  D t;
+
+ protected:
+
+  T limit() {
+    if (t == DegreeType::LATITUDE) {
+      return Constants::LAT_LIMIT;
+    }
+    return Constants::LNG_LIMIT;
+  }
+
+  static void advance(GeoCoordinate<T>& c, T d) {
+    if (withinLimit(c, d)) {
+      c.value = c.value + d;
+    } else {
+      c.value = 0 - (d - (c.limit() - c.value));
+    }
+  }
+
+  static void retreat(GeoCoordinate& c, T d) {
+    if (withinLimit(c, d, true)) {
+      c.value = c.value - d;
+    } else {
+      c.value = 0 - (-(c.limit()) - c.value) - d;
+    }
+  }
 
  public:
-  typedef DegreeValue Longitude;
-  typedef DegreeValue Latitude;
+  GeoCoordinate(T value_, D type_) : value(value_), t(type_) {}
 
-  /**
-   * Coordinate with overloads
-   */
-  template <typename NumericalType>
-  struct Coordinate {
-    DegreeValue degree;
-    T limit;
+  // void operator+(const GeoLocation& other) {
 
-    Coordinate(T value) : degree(value) {
-      if constexpr (std::is_same_v<NumericalType, Longitude>) {
-        limit = 180;
-      } else if constexpr (std::is_same_v<NumericalType, Latitude>) {
-        limit = 90;
-      } else {
-    	limit = std::numeric_limits<NumericalType>::max(); // error
-      }
-    }
+  // }
 
-    /**
-     * Overload operators to constrain range
-     */
-    Coordinate operator+(const Coordinate& other) {
-      CoordPair p{this->degree, other.degree};
-      if ((First(p) + Second(p)) > limit) {
-        auto diff = limit - First(p);
-        auto remain = Second(p) - diff;
-        return (Coordinate(0 - remain));
-      }
-      return Coordinate(First(p) + Second(p));
-    }
+  void operator+(const GeoCoordinate& other) {
+    GeoCoordinate::advance(*this, other.getValue());
+  }
 
-    Coordinate operator-(const Coordinate& other) {
-      CoordPair p{this->degree, other.degree};
-      if ((First(p) - Second(p)) < -limit) {
-        auto diff = -limit - First(p);
-        auto remain = diff - Second(p);
-        return Coordinate(0 - remain);
-      }
-      return Coordinate(First(p) - Second(p));
-    }
-  };
-  // The coordinate value member
-  Coordinate<T> value;
+  void operator-(const GeoCoordinate& other) {
+    GeoCoordinate::retreat(*this, other.getValue());
+   }
+
+  friend std::ostream& operator<<(std::ostream& o, const GeoCoordinate<T> c) {
+    return (o << c.value);
+  }
+
+  T getValue() const { return value; }
+
+  D type() const { return t;}
 };
 
-/**
- * GeoLocation
- */
 template <typename T>
 class GeoLocation {
+  GeoCoordinate<T> lat;
+  GeoCoordinate<T> lgt;
+
  public:
-  /**
-   * constructor
-   */
-  GeoLocation<T>(T lng, T lat) : longitude(lng), latitude(lat) {}
-  /* members */
-  typename GeoCoordinate<T>::Longitude longitude;
-  typename GeoCoordinate<T>::Latitude latitude;
-/**
- * Utility function
- */
-  static T distanceBetween(GeoLocation<T> origin, GeoLocation<T> destination) {
-	// implement - http://www.movable-type.co.uk/scripts/latlong-vincenty.html
-    return T{};
+  GeoLocation(T latitude_, T longitude_)
+      : lat(latitude_, DegreeType::LATITUDE),
+        lgt(longitude_, DegreeType::LONGITUDE) {}
+
+  void operator+(const GeoLocation<T>& delta) {
+    *this + delta.lat;
+    *this + delta.lgt;
   }
 
-  void moveBy(GeoLocation<T> delta) {
-    longitude = longitude + delta.longitude;
-    latitude = latitude + delta.latitude;
+  void operator+(const GeoCoordinate<T>& delta) {
+    if (delta.type() == D::LATITUDE) {
+      lat + delta;
+    } else {
+      lgt + delta;
+    }
+  }
+
+  void operator-(const GeoCoordinate<T>& delta) {
+    if (delta.type() == D::LATITUDE) {
+      lat - delta;
+    } else {
+      lgt - delta;
+    }
+  }
+
+  friend std::ostream& operator<<(std::ostream& o, GeoLocation<T>& g) {
+    o << g.lat << " : " << g.lgt << std::endl;
+    return o;
+  }
+
+  T longitude() const {
+    return lgt.getValue();
+  }
+
+  T latitude() const {
+    return lat.getValue();
   }
 };
+
+template <typename T>
+inline bool withinLimit(const GeoCoordinate<T>& c, T delta, bool bottom = false) {
+  if (bottom) {
+    return c.type() == DegreeType::LATITUDE ?
+      c.getValue() - delta > (-Constants::LAT_LIMIT) :
+      c.getValue() - delta > (-Constants::LNG_LIMIT);
+  }
+  return c.type() == DegreeType::LATITUDE ?
+    c.getValue() + delta < Constants::LAT_LIMIT :
+    c.getValue() + delta < Constants::LNG_LIMIT;
+}
 
 namespace GeoUtil {
   /**
@@ -123,7 +154,7 @@ inline std::string geoJSONFeature(GeoLocation<float> location, std::string id) {
     "{\"type\": \"Feature\",\
       \"geometry\": {\
         \"type\": \"Point\",\
-        \"coordinates\": [" + std::to_string(location.longitude) + ", " + std::to_string(location.latitude) + "]\
+        \"coordinates\": [" + std::to_string(location.longitude()) + ", " + std::to_string(location.latitude()) + "]\
        },\
       \"properties\": {\
         \"name\":\"" + id + "\"\
