@@ -48,10 +48,6 @@ class GeoCoordinate {
  public:
   GeoCoordinate(T value_, D type_) : value(value_), t(type_) {}
 
-  // void operator+(const GeoLocation& other) {
-
-  // }
-
   void operator+(const GeoCoordinate& other) {
     GeoCoordinate::advance(*this, other.getValue());
   }
