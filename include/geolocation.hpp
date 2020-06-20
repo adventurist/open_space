@@ -21,12 +21,10 @@ class GeoCoordinate {
   D t;
 
  protected:
-
   T limit() {
-    if (t == DegreeType::LATITUDE) {
-      return Constants::LAT_LIMIT;
-    }
-    return Constants::LNG_LIMIT;
+    return t == DegreeType::LATITUDE ?
+      Constants::LAT_LIMIT :
+      Constants::LNG_LIMIT;
   }
 
   static void shift(GeoCoordinate<T>& c, T d) {
