@@ -7,29 +7,23 @@
 #include <cstring>
 
 using namespace Space;
+
+/**
+ * Our world
+ */
 World* world;
+
+/**
+ * static function declarations
+ */
 void create(void);
 void run(uint32_t lifecycle = INT32_MAX);
 
-int main(int argc, char** argv) {
-  world = new World{};
-
-  if (argc > 1 && strcmp(argv[1], "--daemon") == 0) {
-    std::thread world_thread{run, INT32_MAX};
-
-    while (world != nullptr) {
-      continue;
-    }
-
-    if (world_thread.joinable()) {
-      world_thread.join();
-    }
-  }
-  run(1);
-
-  return 0;
-}
-
+/**
+ * create
+ *
+ * @param
+ */
 World create(World* world) {
   world->nodes.clear();
   world->nodes.push_back(Node{});
@@ -38,13 +32,18 @@ World create(World* world) {
       &world->nodes.at(i - 1),
       &world->master_node,
       getRandom(),
-      GeoUtil::getLocation(),
+      GeoUtil::getGeoLocation(),
       i
     });
   }
   return std::move(*world);
 }
 
+/**
+ * run
+ *
+ * @param
+ */
 void run(uint32_t lifecycle) {
   World active_world = create(world);
   uint32_t world_index = 0;
@@ -55,4 +54,34 @@ void run(uint32_t lifecycle) {
   }
   delete world;
   world = nullptr;
+}
+
+/**
+ * daemonMode
+ */
+
+inline bool daemonMode(char* arg) {
+  return strcmp(arg, "--daemon") == 0;
+}
+
+/**
+ * main
+ */
+int main(int argc, char** argv) {
+  world = new World{};
+
+  if (argc > 1 && daemonMode(argv[1])) {
+    std::thread world_thread{run, INT32_MAX};
+    while (world != nullptr) {
+      continue;
+    }
+
+    if (world_thread.joinable()) {
+      world_thread.join();
+    }
+  } else {
+    run(1);
+  }
+
+  return 0;
 }
