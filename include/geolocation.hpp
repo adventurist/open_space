@@ -29,19 +29,16 @@ class GeoCoordinate {
     return Constants::LNG_LIMIT;
   }
 
-  static void advance(GeoCoordinate<T>& c, T d) {
+  static void shift(GeoCoordinate<T>& c, T d) {
     if (withinLimit(c, d)) {
       c.value = c.value + d;
     } else {
-      c.value = 0 - (d - (c.limit() - c.value));
-    }
-  }
-
-  static void retreat(GeoCoordinate& c, T d) {
-    if (withinLimit(c, d, true)) {
-      c.value = c.value - d;
-    } else {
-      c.value = 0 - (-(c.limit()) - c.value) - d;
+      auto modifier = c.getValue() < 0 ? -1 : 1;
+      if (d < 0) {
+        c.value = 0 - (d + (c.limit() - (modifier * c.value)));
+      } else {
+        c.value = 0 - (d - (c.limit() - (modifier * c.value)));
+      }
     }
   }
 
@@ -49,12 +46,8 @@ class GeoCoordinate {
   GeoCoordinate(T value_, D type_) : value(value_), t(type_) {}
 
   void operator+(const GeoCoordinate& other) {
-    GeoCoordinate::advance(*this, other.getValue());
+    GeoCoordinate::shift(*this, other.getValue());
   }
-
-  void operator-(const GeoCoordinate& other) {
-    GeoCoordinate::retreat(*this, other.getValue());
-   }
 
   friend std::ostream& operator<<(std::ostream& o, const GeoCoordinate<T> c) {
     return (o << c.value);
@@ -88,14 +81,6 @@ class GeoLocation {
     }
   }
 
-  void operator-(const GeoCoordinate<T>& delta) {
-    if (delta.type() == D::LATITUDE) {
-      lat - delta;
-    } else {
-      lgt - delta;
-    }
-  }
-
   friend std::ostream& operator<<(std::ostream& o, GeoLocation<T>& g) {
     o << g.lat << " : " << g.lgt << std::endl;
     return o;
@@ -111,15 +96,16 @@ class GeoLocation {
 };
 
 template <typename T>
-inline bool withinLimit(const GeoCoordinate<T>& c, T delta, bool bottom = false) {
+inline bool withinLimit(const GeoCoordinate<T>& c, T delta) {
+  auto bottom = std::is_signed<T>() && c.getValue() < 0;
   if (bottom) {
     return c.type() == DegreeType::LATITUDE ?
-      c.getValue() - delta > (-Constants::LAT_LIMIT) :
-      c.getValue() - delta > (-Constants::LNG_LIMIT);
+      (c.getValue() + delta) > (-Constants::LAT_LIMIT) :
+      (c.getValue() + delta) > (-Constants::LNG_LIMIT);
   }
   return c.type() == DegreeType::LATITUDE ?
-    c.getValue() + delta < Constants::LAT_LIMIT :
-    c.getValue() + delta < Constants::LNG_LIMIT;
+     (c.getValue() + delta) < Constants::LAT_LIMIT :
+     (c.getValue() + delta) < Constants::LNG_LIMIT;
 }
 
 namespace GeoUtil {
@@ -127,10 +113,14 @@ namespace GeoUtil {
  * Poor man's number gen
  */
 template <typename T>
-inline T getRandom(T min = 1, T max = 10) {
+inline T getRandom(T min = 1, T max = 10, bool positive_or_negative = false) {
   int random{};
-  while (!(random >= min && random <= max)) {
-    random = rand() / 100000000;
+  T modifier = 1;
+  if (std::is_signed<T>()) {
+    modifier = rand() > 1073741823 ? modifier * (-1) : modifier;
+  }
+  while (!((modifier * random) >= min && random <= max)) {
+    random = modifier * rand() / 100000000;
   }
   return random;
 }
@@ -140,8 +130,8 @@ inline T getRandom(T min = 1, T max = 10) {
  */
 inline GeoLocation<float> getLocation() {
   return GeoLocation<float>{
-    180.0f / getRandom<float>(),
-    90.0f / getRandom<float>()
+    90.0f / getRandom<float>(),
+    180.0f / getRandom<float>()
   };
 }
 

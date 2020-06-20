@@ -9,17 +9,24 @@
 using namespace Space;
 World* world;
 void create(void);
-void run(void);
+void run(uint32_t lifecycle = INT32_MAX);
 
 int main(int argc, char** argv) {
+  world = new World{};
+
   if (argc > 1 && strcmp(argv[1], "--daemon") == 0) {
-    for (;;) {
-      run();
-      std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+    std::thread world_thread{run, INT32_MAX};
+
+    while (world != nullptr) {
+      continue;
     }
-  } else {
-     run();
+
+    if (world_thread.joinable()) {
+      world_thread.join();
+    }
   }
+  run(1);
+
   return 0;
 }
 
@@ -38,12 +45,14 @@ World create(World* world) {
   return std::move(*world);
 }
 
-void run() {
-  world = new World{};
+void run(uint32_t lifecycle) {
   World active_world = create(world);
-  for (;;) {
+  uint32_t world_index = 0;
+  while (world_index++ < lifecycle) {
     active_world.tick();
     active_world.toGeoJSON();
+    std::this_thread::sleep_for(std::chrono::milliseconds(3000));
   }
   delete world;
+  world = nullptr;
 }
