@@ -7,6 +7,7 @@
 #include <random>
 #include <string>
 
+#define HALF_INT_MAX 1073741823
 namespace Constants {
   static constexpr int LAT_LIMIT = 90;
   static constexpr int LNG_LIMIT = 180;
@@ -115,7 +116,7 @@ inline T getRandom(T min = 1, T max = 10, bool positive_or_negative = false) {
   int random{};
   T modifier = 1;
   if (std::is_signed<T>()) {
-    modifier = rand() > 1073741823 ? modifier * (-1) : modifier;
+    modifier = rand() > HALF_INT_MAX ? modifier * (-1) : modifier;
   }
   while (!((modifier * random) >= min && random <= max)) {
     random = modifier * rand() / 100000000;
