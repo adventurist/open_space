@@ -257,10 +257,10 @@ window.setInterval(function() {
   for (let entity of entities) {
     var pos = entity.position._value;
     var cart = Cesium.Ellipsoid.WGS84.cartesianToCartographic(pos);
-    pos = Cesium.Cartesian3.fromRadians(cart.longitude + (1 * Math.PI / 180), cart.latitude, cart.height);
+    pos = Cesium.Cartesian3.fromRadians(cart.longitude + (0.25 * Math.PI / 180), cart.latitude, cart.height);
     entity.position = pos
   }
-}, 200);
+}, 1000);
 </script>
 </body>
 </html>
