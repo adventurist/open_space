@@ -32,7 +32,7 @@
     </div>
   </div>
   <script>
-    Cesium.Ion.defaultAccessToken = 'TOKEN HERE'
+    Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIzMDU2M2Y2Ni1iNThhLTRmMWQtOTI2ZC0yNWRiMjc3MWJiOTAiLCJpZCI6Mjg1ODAsInNjb3BlcyI6WyJhc3IiLCJnYyJdLCJpYXQiOjE1OTEyMzcyOTh9.7C34MZ4jgnENUvm9m8joAcCBofyilLlWBWOu0ybTwr4'
     var navParent = document.getElementById('nav-arrows');
     var navReset = document.getElementById('nav-reset');
     var layerBtn = document.getElementById('layer-toggle');
@@ -198,14 +198,20 @@
 
   canvas.setAttribute('tabindex', -1);
 
+  const nodePositions = []
+  let entities
+
   var dataSource = new Cesium.GeoJsonDataSource();
   dataSource.load('/tmp/nodes.json').then(function(data)  {
     viewer.dataSources.add(data);
     viewer.zoomTo(data);
-    var entities = data.entities.values;
+    entities = data.entities.values;
 
     for (var i = 0; i < entities.length; i++) {
       var entity = entities[i];
+
+      nodePositions[entity.properties.name] = Object.assign({}, entity.position)
+      console.log(entity.position)
 
       var mLabel = {
         text: entity.properties.name,
@@ -225,8 +231,36 @@
         minimumPixelSize: 256,
         maximumScale: 8192
       }
+      // entity.position = new Cesium.CallbackProperty(() => { return nodePositions[entity.name] })
+      // entity.position = nodePositions[entity.name]
     }
   });
+
+
+/*var e = viewer.entities.add({
+  name : 'Sphere',
+  position: Cesium.Cartesian3.fromDegrees(-100, 30.0, 300000.0),
+  ellipsoid : {
+      radii : new Cesium.Cartesian3(200000.0, 200000.0, 200000.0)
+  }
+});*/
+
+window.setInterval(function() {
+/*  var pos = e.position._value;
+
+  var cart = Cesium.Ellipsoid.WGS84.cartesianToCartographic(pos);
+
+  pos = Cesium.Cartesian3.fromRadians(cart.longitude + (1 * Math.PI / 180), cart.latitude, cart.height);
+
+  e.position = pos;
+*/
+  for (let entity of entities) {
+    var pos = entity.position._value;
+    var cart = Cesium.Ellipsoid.WGS84.cartesianToCartographic(pos);
+    pos = Cesium.Cartesian3.fromRadians(cart.longitude + (1 * Math.PI / 180), cart.latitude, cart.height);
+    entity.position = pos
+  }
+}, 200);
 </script>
 </body>
 </html>
