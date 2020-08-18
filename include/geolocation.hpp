@@ -6,6 +6,7 @@
 #include <limits>
 #include <random>
 #include <string>
+#include <iostream>
 
 #define HALF_INT_MAX 1073741823
 /**
@@ -57,15 +58,26 @@ class GeoCoordinate {
  * @param
  */
   static void shift(GeoCoordinate<T>& c, T d) {
+    std::cout << "adding " << d << " to " << c.getValue() << std::endl;
     if (withinLimit(c, d)) {
+      std::cout << "within limit" << std::endl;
       c.value = c.value + d;
     } else {
+      std::cout << "outside limit" << std::endl;
       auto modifier = c.getValue() < 0 ? -1 : 1;
+      std::cout << "modifier " << modifier << std::endl;
       if (d < 0) {
         c.value = 0 - (d + (c.limit() - (modifier * c.value)));
       } else {
         c.value = 0 - (d - (c.limit() - (modifier * c.value)));
       }
+    }
+    if (c.getValue() > c.limit()) {
+      throw std::logic_error{
+        std::string{
+          "GeoCoordinate::shift() failed.\nFinal value was" + std::to_string(c.getValue())
+        }
+      };
     }
   }
 
@@ -129,9 +141,7 @@ class GeoLocation {
   GeoLocation(T latitude_, T longitude_)
       : lat(latitude_, D::LATITUDE),
         lgt(longitude_, D::LONGITUDE) {
-          if (latitude_ > 90 || longitude_ > 180) {
-            throw std::invalid_argument{"Value outside valid range"};
-          }
+
         }
 
   /**
@@ -159,6 +169,10 @@ class GeoLocation {
   friend std::ostream& operator<<(std::ostream& o, GeoLocation<T>& g) {
     o << g.lat << " : " << g.lgt << std::endl;
     return o;
+  }
+
+  static GeoLocation<T> measureDistance(const GeoLocation<T>& a, const GeoLocation<T> b) {
+    return GeoLocation<T>{b.latitude() - a.latitude(), b.longitude() - a.longitude()};
   }
 
   /**
@@ -241,5 +255,5 @@ inline std::string geoJSONFeature(GeoLocation<float> location, std::string id) {
 
   return geoJSONString;
 }
-}
+} // namespace GeoUtil
 #endif // __GEO_LOCATION_HPP__

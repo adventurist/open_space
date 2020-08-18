@@ -1,4 +1,5 @@
 #include <open_space.hpp>
+#include <server.hpp>
 #include <range.hpp>
 #include <util.hpp>
 #include <vector>
@@ -27,7 +28,7 @@ void run(uint32_t lifecycle = INT32_MAX);
 World create(World* world) {
   world->nodes.clear();
   world->nodes.push_back(Node{});
-  for (const auto& i : range<int>{1, 100}) {
+  for (const auto& i : Range<int>{1, 100}) {
     world->nodes.push_back(Node{
       &world->nodes.at(i - 1),
       &world->master_node,
@@ -36,6 +37,12 @@ World create(World* world) {
       i
     });
   }
+  world->nodes.at(0).setNext(
+    &world->nodes.at(
+      world->nodes.size() - 1
+    )
+  );
+  world->nodes.at(0).receive("Message");
   return std::move(*world);
 }
 
@@ -56,6 +63,10 @@ void run(uint32_t lifecycle) {
   world = nullptr;
 }
 
+void server() {
+LocationServer::start_http_server();
+}
+
 /**
  * daemonMode
  */
@@ -72,12 +83,16 @@ int main(int argc, char** argv) {
 
   if (argc > 1 && daemonMode(argv[1])) {
     std::thread world_thread{run, INT32_MAX};
+    std::thread server_thread{server};
     while (world != nullptr) {
       continue;
     }
 
     if (world_thread.joinable()) {
       world_thread.join();
+    }
+    if (server_thread.joinable()) {
+      server_thread.join();
     }
   } else {
     run(1);
