@@ -291,34 +291,15 @@
         minimumPixelSize: 256,
         maximumScale: 8192
       }
-      // entity.position = new Cesium.CallbackProperty(() => { return nodePositions[entity.name] })
-      // entity.position = nodePositions[entity.name]
     }
   });
-
-
-/*var e = viewer.entities.add({
-  name : 'Sphere',
-  position: Cesium.Cartesian3.fromDegrees(-100, 30.0, 300000.0),
-  ellipsoid : {
-      radii : new Cesium.Cartesian3(200000.0, 200000.0, 200000.0)
-  }
-});*/
 
 let nodeData
 
 window.setInterval(async function() {
-/*  var pos = e.position._value;
-
-  var cart = Cesium.Ellipsoid.WGS84.cartesianToCartographic(pos);
-
-  pos = Cesium.Cartesian3.fromRadians(cart.longitude + (1 * Math.PI / 180), cart.latitude, cart.height);
-
-  e.position = pos;
-*/
 
   result = await request({
-    url: "http://127.0.0.1:9820/nodes",
+    url: "http://nodes.stronglogicsolutions.com/nodes",
     method: "GET"
   })
 
