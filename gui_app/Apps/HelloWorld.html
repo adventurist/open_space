@@ -9,6 +9,68 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
   <title>Stronglogic Solutions</title>
   <script src="../Build/Cesium/Cesium.js"></script>
+  <script>
+  async function request(options) {
+    const {
+        url,
+        method,
+        params,
+        body,
+        headers,
+        credentials
+    } = { ...options }
+
+    delete options.body
+    delete options.credentials
+    delete options.method
+    delete options.url
+    delete options.headers
+    delete options.params
+
+
+    let queryString
+    let requestHeaders
+    let requestOptions
+
+    if (params) {
+        let keys = Object.keys({...params})
+        if (keys.length > 0) {
+            queryString = '?' + keys.map(key => `${key}=${params[key]}`).join('&')
+        }
+    }
+
+    if (headers) {
+        let keys = Object.keys({...headers})
+        if (keys.length > 0) {
+            requestHeaders = headers
+        }
+    }
+
+    requestOptions = {
+        method: method !== void 0 ? method : 'GET',
+        body: body !== void 0 ? typeof body === 'string' ? body : JSON.stringify(body): '',
+        headers: requestHeaders,
+        credentials: credentials !== void 0 ? credentials : 'omit',
+        // Pass all remaining options
+        ... options
+    }
+
+    if (requestOptions.method === 'GET') {
+        delete requestOptions.body
+    }
+
+
+    const response = await fetch(`${url}${queryString ? queryString : ''}`, requestOptions)
+    if (response) {
+        const responseData = await response.json()
+        let error = responseData.error ? responseData.error : false
+        return {
+            body: responseData,
+            error
+        }
+    }
+  }
+  </script>
   <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
   <style>
       @import url(../Build/Cesium/Widgets/widgets.css);
@@ -198,7 +260,6 @@
 
   canvas.setAttribute('tabindex', -1);
 
-  const nodePositions = []
   let entities
 
   var dataSource = new Cesium.GeoJsonDataSource();
@@ -208,9 +269,8 @@
     entities = data.entities.values;
 
     for (var i = 0; i < entities.length; i++) {
-      var entity = entities[i];
+      var entity = entities[i]
 
-      nodePositions[entity.properties.name] = Object.assign({}, entity.position)
       console.log(entity.position)
 
       var mLabel = {
@@ -245,7 +305,9 @@
   }
 });*/
 
-window.setInterval(function() {
+let nodeData
+
+window.setInterval(async function() {
 /*  var pos = e.position._value;
 
   var cart = Cesium.Ellipsoid.WGS84.cartesianToCartographic(pos);
@@ -254,13 +316,28 @@ window.setInterval(function() {
 
   e.position = pos;
 */
-  for (let entity of entities) {
-    var pos = entity.position._value;
-    var cart = Cesium.Ellipsoid.WGS84.cartesianToCartographic(pos);
-    pos = Cesium.Cartesian3.fromRadians(cart.longitude + (0.25 * Math.PI / 180), cart.latitude, cart.height);
-    entity.position = pos
+
+  result = await request({
+    url: "http://127.0.0.1:9820/nodes",
+    method: "GET"
+  })
+
+  if (result.error) {
+    console.log('Failed to fetch node data')
+  } else {
+    nodeData = result.body
   }
-}, 1000);
+}, 5000);
+
+viewer.scene.postRender.addEventListener((scene, time) => {
+  if (nodeData) {
+    for (let entity of entities) {
+      let newLocation = nodeData[entity.name]
+      let newCartesian = Cesium.Cartesian3.fromDegrees(newLocation[0], newLocation[1])
+      entity.position = newCartesian
+    }
+  }
+});
 </script>
 </body>
 </html>

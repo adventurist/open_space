@@ -53,7 +53,7 @@ void Node::moveBy(const GeoLocation<float>& delta) {
 
 std::string Node::jsonString() {
   return std::string{
-    std::to_string(id) + ":[" +
+    "\"" + std::to_string(id) + "\"" + ":[" +
     std::to_string(geolocation.longitude()) + "," +
     std::to_string(geolocation.latitude()) + "]"
   };

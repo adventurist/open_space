@@ -4,12 +4,14 @@
 namespace LocationServer {
 void handle_requests(httplib::Server&& svr) {
   svr.Get("/hi", [](const httplib::Request& req, httplib::Response& res) {
+    res.set_header("Access-Control-Allow-Origin", "*");
     res.set_content("Hello Bitch!!", "text/plain");
   });
 
   svr.Get("/nodes", [](const httplib::Request& req, httplib::Response& res) {
     auto node_string = fetchNodes();
-    res.set_content(node_string, "text/plain");
+    res.set_header("Access-Control-Allow-Origin", "*");
+    res.set_content(node_string, "application/json");
   });
 
   // svr.Get("/vdi", [](const httplib::Request& req, httplib::Response& res) {
@@ -55,7 +57,7 @@ void start_http_server() {
   httplib::Server svr{};
   handle_requests(std::move(svr));
   std::cout << "Starting HTTP server.." << std::endl;
-  std::cout << "Connect to http://localhost:9820" << std::endl;
-  svr.listen("localhost", 9820);
+  std::cout << "Connect to http://127.0.0.1:9820" << std::endl;
+  svr.listen("127.0.0.1", 9820);
 }
 }  // namespace TestServer
